@@ -1,6 +1,6 @@
 import os
 import sys
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey, Integer, String, Enum
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
@@ -8,23 +8,39 @@ from eralchemy import render_er
 
 Base = declarative_base()
 
-class Person(Base):
-    __tablename__ = 'person'
-    # Here we define columns for the table person
-    # Notice that each column is also a normal Python instance attribute.
-    id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
+class user(Base):
+    __tablename__= 'usuarios'
+    userID = Column (Integer, primary_key = True)
+    name = Column (String(50), nullable = False)
+    lastname = Column (String(50), nullable = False)
+    email = Column (String(50), nullable = False, unique = True)
+    password = Column (String(250), nullable = False)
 
-class Address(Base):
-    __tablename__ = 'address'
-    # Here we define columns for the table address.
-    # Notice that each column is also a normal Python instance attribute.
-    id = Column(Integer, primary_key=True)
-    street_name = Column(String(250))
-    street_number = Column(String(250))
-    post_code = Column(String(250), nullable=False)
-    person_id = Column(Integer, ForeignKey('person.id'))
-    person = relationship(Person)
+class follower(Base):
+    __tablename__= 'followers'
+    followerID = Column (Integer, ForeignKey('usuarios.userID'), primary_key = True, nullable=False)
+    user_ID = Column (Integer, ForeignKey('usuarios.userID'), primary_key = True, nullable=False)
+
+
+class post(Base):
+    __tablename__= 'posts'
+    postID = Column (Integer, primary_key = True, nullable=False)
+    user_ID = Column (Integer, ForeignKey('usuarios.userID'), nullable=False)
+
+
+class media(Base):
+    __tablename__= 'media'
+    mediaID = Column (Integer, primary_key = True)
+    type = Column (Enum, nullable=False)
+    url = Column (String(250), nullable=False)
+    post_ID = Column (Integer, ForeignKey('posts.postID'), nullable=False)   
+
+
+class comment(Base):
+    __tablename__= 'comments'
+    commentID = Column (Integer, primary_key = True)
+    author_ID = Column (Integer, ForeignKey('usuarios.userID'))
+    post_ID = Column (Integer, ForeignKey('posts.postID'))
 
     def to_dict(self):
         return {}
